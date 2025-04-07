@@ -1,9 +1,14 @@
 Feature: Test of petnecessity
 
-  Scenario: Create an account
-    Given I am at petnecessity page
+  Scenario Outline: Create an account
+    Given I am at petnecessity page using "<browser>"
     When I create an account
     Then The account is successifully created
+    Examples:
+      | browser  |
+      | chrome  |
+      | firefox  |
+
 
   Scenario Outline: Login thru different Browsers
     Given
@@ -11,5 +16,5 @@ Feature: Test of petnecessity
     Then
 
     Examples:
-      |  |
+      | test7@mailnesia.com |
 
