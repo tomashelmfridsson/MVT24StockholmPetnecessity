@@ -1,5 +1,6 @@
 package stepdefinitions;
 
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -19,9 +20,11 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PetnecessityStepdefs {
-    WebDriver driver;
-    String uniqecode = String.valueOf(UUID.randomUUID());
-    String email = "tomastestgubbe+" + System.currentTimeMillis() + "@gmail.com";
+    private WebDriver driver;
+    private String email;
+    private WebDriverWait wait;
+    private String uniqecode = String.valueOf(UUID.randomUUID());
+    // String email = "tomastestgubbe+" + System.currentTimeMillis() + "@gmail.com";
     //String email = "tomastestgubbe+"+uniqecode+"@gmail.com";
 
     private void waitAndClick(String css) {
@@ -29,25 +32,38 @@ public class PetnecessityStepdefs {
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(css))).click();
     }
 
+    private void waitToBeDisplayed(String css) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(css)));
+    }
+
+
     @Given("I am at petnecessity page using {string}")
     public void iAmAtPetnecessityPage(String browser) {
+
         if (browser.equals("chrome")) driver = new ChromeDriver();
         if (browser.equals("firefox")) driver = new FirefoxDriver();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.get("https://www.petnecessity.co.uk/");
         driver.findElement(By.cssSelector("button.accept")).click();
-        waitAndClick(".sqs-popup-overlay-close");
+        wait.until(ExpectedConditions
+                .elementToBeClickable(By.cssSelector(".sqs-popup-overlay-close")))
+                .click();
+        //waitAndClick(".sqs-popup-overlay-close");
         driver.manage().window().maximize();
     }
 
-    @When("I create an account")
-    public void iCreateAnAccount() throws InterruptedException {
+    @When("I create an account with {string}")
+    public void iCreateAnAccount(String email) throws InterruptedException {
+        this.email = email;
         driver.findElement(By.cssSelector(".user-accounts-link")).click();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.id("accountFrame")));
         driver.findElement(By.cssSelector("[href=\"/account/login/create\"]")).click();
         driver.findElement(By.cssSelector("[data-test=\"create-account-first-name\"]"))
                 .sendKeys("Test");
-        driver.findElement(By.cssSelector("[data-test=\"create-account-last-name\"]"))
+        if (driver.findElement(By.cssSelector("[data-test=\"create-account-last-name\"]")).getText().isEmpty())
+            driver.findElement(By.cssSelector("[data-test=\"create-account-last-name\"]"))
                 .sendKeys("Testsson");
         driver.findElement(By.cssSelector("[data-test=\"create-account-email\"]"))
                 .sendKeys(email);
@@ -63,18 +79,7 @@ public class PetnecessityStepdefs {
     public void theAccountIsSuccessifullyCreated() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.id("accountFrame")));
-        WebElement element = waitToBeDisplayed("div.ICe1WgSVsUcTjhT1");
-//        driver.findElement(By
-//                .cssSelector("[href=\"/account/profile\"]")).isDisplayed();
-//        driver.findElement(By
-//                .cssSelector("[href=\"/account/profile\"] > div")).isDisplayed();
-//        driver.findElement(By
-//                .cssSelector("[href=\"/account/profile\"] > div > div")).isDisplayed();
-//        System.out.println(driver.findElement(By
-//                .cssSelector("[href=\"/account/profile\"] > div > div")).getText());
-//        String text =  driver.findElement(By
-//                .cssSelector("[href=\"/account/profile\"] > div > div:nth-child(2)")).getText();
-
+        waitToBeDisplayed("div.ICe1WgSVsUcTjhT1");
 
         List<WebElement> elements = driver.findElements(By
                 .cssSelector("div.ICe1WgSVsUcTjhT1"));
@@ -84,8 +89,20 @@ public class PetnecessityStepdefs {
         assertEquals(email, text);
     }
 
-    private WebElement waitToBeDisplayed(String css) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(css)));
+    private void fillForm(){
+
+    }
+
+    @Then("The {string} is displayed")
+    public void theErrormessageIsDisplayed(String errmsg) {
+        String err = driver.findElement(By.cssSelector(".class")).getText();
+        assertEquals(errmsg, err);
+    }
+
+    @And("I recieve an email")
+    public void iRecieveAnEmail() {
+    WebDriver driverMailnesia = new ChromeDriver();
+    driver.get("https://mailnesia.com/mailbox/tomas123");
+
     }
 }

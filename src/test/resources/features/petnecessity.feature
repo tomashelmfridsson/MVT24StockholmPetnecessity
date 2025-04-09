@@ -1,20 +1,20 @@
 Feature: Test of petnecessity
 
-  Scenario Outline: Create an account
+  Scenario Outline: Create an account with a long lastname
     Given I am at petnecessity page using "<browser>"
-    When I create an account
+    When I create an account with "<email>"
     Then The account is successifully created
-    Examples:
-      | browser  |
-      | chrome  |
-      | firefox  |
-
-
-  Scenario Outline: Login thru different Browsers
-    Given
-    When
-    Then
+    And I recieve an email
 
     Examples:
-      | test7@mailnesia.com |
+      | browser  | email |
+      | chrome  | tomas123@mailnesia.com |
 
+
+  Scenario Outline: Error messages
+
+      Then The "<errormessage>" is displayed
+
+    Examples:
+      | firstName   | lastname    | errormessage      |
+      | Tomas       | ""          | lastname missing  |
